@@ -37,15 +37,32 @@ class FilterBox extends React.Component {
     };
   }
 
+  static propTypes: {
+    max: React.PropTypes.number.isRequired
+  }
+
   printNames(){
-      const { courseListing } = this.state;
-      return courseListing.map((cur, i) => {
+    const { courseListing } = this.state;
+    let items = courseListing.slice(0, this.props.max);
+    let remaining = courseListing.length - items.length;
+    let count = 1;
+    items.push('And ' + remaining + ' others');
+    return items.map((cur, i) => {
+      if(count != this.props.max){
+        ++count;
         return (
           <div className='FilterBoxItem' key={i}>
             {cur}
           </div>
         );
-      });
+      } else {
+        return (
+          <div className='FilterBoxItem' key={i}>
+            <i>{cur}</i>
+          </div>
+        );
+      }
+    });
   }
 
   handleInputChange(e) {
@@ -53,7 +70,6 @@ class FilterBox extends React.Component {
       inputValue: e.target.value,
       courseListing: this.state.courseBackup.filter((cur) => {return cur.toLowerCase().includes(e.target.value.toLowerCase())})
     })
-    console.log(this.state.courseListing);
   }
 
   handleInputClick(e) {
@@ -63,11 +79,21 @@ class FilterBox extends React.Component {
     });
   }
 
+  handleOffFocus(){
+    this.setState({ open: !this.state.open })
+  }
+
   renderContent() {
     return (
       <div className="FilterBoxDropDown">
         <form onSubmit={(e) => preventDefault(e)}>
-        <input onClick={(e) => this.handleInputClick(e)} onChange={(e) => this.handleInputChange(e)} type="text" className="FilterBoxInput"></input>
+        <input
+          onClick={(e) => this.handleInputClick(e)}
+          onChange={(e) => this.handleInputChange(e)}
+          onBlur={() => this.handleOffFocus()}
+          type="text"
+          className="FilterBoxInput">
+        </input>
           <div className="divider">
           { this.state.open ? this.printNames() : null }
           </div>
@@ -78,11 +104,9 @@ class FilterBox extends React.Component {
 
   render() {
     return (
-      <center>
       <div className='results'>
         { this.renderContent() }
       </div>
-      </center>
     );
   }
 }
