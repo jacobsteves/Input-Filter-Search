@@ -1,0 +1,48 @@
+.form input {
+    height:20px;
+    width:220px;
+    list-style-type: none;
+}
+
+.results {
+}
+
+.FilterBoxDropDown {
+  	left: 0;
+  	position: absolute;
+  	top: 35px;
+  	z-index: 1;
+    width: 30%;
+  	-webkit-transition: all .25s ease;
+  	-moz-transition: all .25s ease;
+  	-ms-transition: all .25s ease;
+  	-o-transition: all .25s ease;
+  	transition: all .25s ease;
+  }
+
+.FilterBoxDropDown .divider {
+  width: 70%;
+  float: left;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+     -moz-box-shadow: 0 8px 6px -6px black;
+          box-shadow: 0 8px 6px -6px black;
+}
+.FilterBoxDropDown .FilterBoxItem {
+    font: normal 13px/50px Arial, Helvetica, sans-serif;
+    padding: 0 25px;
+  	background: #01abf8;
+  	color:#FFF;
+  }
+
+  .FilterBoxDropDown .FilterBoxItem:hover {
+  	background: #bbb;
+  }
+
+.FilterBoxInput {
+    width: 100%;
+    padding: 12px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
