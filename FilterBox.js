@@ -32,21 +32,23 @@ class FilterBox extends React.Component {
     this.state = {
       inputValue: '',
       open: false,
+      Response: 'none',
       courseListing: ['CS100', 'CS135', 'CS136', 'CS240', 'CS241'],
       courseBackup: ['CS100', 'CS135', 'CS136', 'CS240', 'CS241']
     };
   }
 
   static propTypes: {
-    max: React.PropTypes.number.isRequired
+    max: React.PropTypes.number.isRequired,
+    handleSelect: React.PropTypes.func.isRequired
   }
 
   printNames(){
     const { courseListing } = this.state;
-    let items = courseListing.slice(0, this.props.max);
+    let items = courseListing.slice(0, this.props.max + 1);
     let remaining = courseListing.length - items.length;
-    let count = 1;
-    items.push('And ' + remaining + ' others');
+    let count = 0;
+    let response = 'And ' + remaining + ' others';
     return items.map((cur, i) => {
       if(count != this.props.max){
         ++count;
@@ -55,10 +57,10 @@ class FilterBox extends React.Component {
             {cur}
           </div>
         );
-      } else {
+      } else if(remaining > 0) {
         return (
           <div className='FilterBoxItem' key={i}>
-            <i>{cur}</i>
+            <i>{response}</i>
           </div>
         );
       }
@@ -83,20 +85,42 @@ class FilterBox extends React.Component {
     this.setState({ open: !this.state.open })
   }
 
+  handleInputSubmit(e){
+    e.preventDefault();
+    const { inputValue } = this.state;
+    let courseListing = this.state.courseBackup.map((cur, i) => {
+      return cur.toLowerCase();
+    });
+    const index = courseListing.indexOf(inputValue.toLowerCase());
+    this.setState({
+      courseListing: []
+    });
+    this.handleSelect(inputValue, index);
+  }
+
+  handleSelect(choice, index){
+    if (index>=0) {
+      this.setState({Response: choice + ' is a nice choice'});
+    } else {
+      this.setState({Response: choice + ' isn\'t on the list!'});
+    }
+  }
+
   renderContent() {
     return (
       <div className="FilterBoxDropDown">
-        <form onSubmit={(e) => preventDefault(e)}>
-        <input
-          onClick={(e) => this.handleInputClick(e)}
-          onChange={(e) => this.handleInputChange(e)}
-          onBlur={() => this.handleOffFocus()}
-          type="text"
-          className="FilterBoxInput">
-        </input>
-          <div className="divider">
-          { this.state.open ? this.printNames() : null }
-          </div>
+        <form onSubmit={(e) => this.handleInputSubmit(e)}>
+          <input
+            onFocus={(e) => this.handleInputClick(e)}
+            onChange={(e) => this.handleInputChange(e)}
+            onBlur={() => this.handleOffFocus()}
+            type="text"
+            className="FilterBoxInput">
+          </input>
+            <div className="divider">
+            { this.state.open ? this.printNames() : null }
+            </div>
+            <p>{ this.state.Response }</p>
         </form>
       </div>
     );
