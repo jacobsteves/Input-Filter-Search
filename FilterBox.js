@@ -36,7 +36,8 @@ class FilterBox extends React.Component {
       currentIndex: -1,
       lastVal: '',
       courseListing: ['CS100', 'CS135', 'CS136', 'CS240', 'CS241'],
-      courseBackup: ['CS100', 'CS135', 'CS136', 'CS240', 'CS241']
+      courseBackup: ['CS100', 'CS135', 'CS136', 'CS240', 'CS241'],
+      clickedList: ['n','n','n','n','n'] // 'n' = no, not clicked; 'y' = yes, clicked
     };
   }
 
@@ -122,24 +123,73 @@ class FilterBox extends React.Component {
       return cur.toLowerCase();
     });
     const index = courseListing.indexOf(value.toLowerCase());
+    let newClicked = this.state.clickedList;
+    newClicked[index] = 'y';
     this.setState({
-      currentIndex: index
+      currentIndex: index,
+      clickedList: newClicked
     });
   }
 
-  handlePresetExit(){
-    this.setState({currentIndex: -1})
+  handlePresetExit(value){
+    let courseListing = this.state.courseBackup.map((cur, i) => {
+      return cur.toLowerCase();
+    });
+    const index = courseListing.indexOf(value.toLowerCase());
+    let newClicked = this.state.clickedList;
+    newClicked[index] = 'n';
+    this.setState({
+      currentIndex: -1,
+      clickedList: newClicked
+    })
   }
 
   handleKeyDown(e){
+    let index = this.state.currentIndex;
     switch(e.keyCode){
       case 38: //This is the up arrow
       console.log("up");
+      if(index >= 1) {
+        let newClicked = this.state.clickedList;
+        newClicked[index] = 'n';
+        newClicked[index - 1] = 'y';
+        this.setState({
+          currentIndex: index - 1,
+          clickedList: newClicked
+        })
+      } else {
+        let newClicked = this.state.clickedList;
+        newClicked[0] = 'n';
+        newClicked[this.props.max] = 'y';
+        this.setState({
+          currentIndex: this.props.max,
+          clickedList: newClicked
+        })
+      }
+      console.log(index);
       break;
 
       case 40: //This is the down arrow
       console.log("down");
-      break
+      if(index < this.props.max) {
+        let newClicked = this.state.clickedList;
+        newClicked[index] = 'n';
+        newClicked[index + 1] = 'y';
+        this.setState({
+          currentIndex: index + 1,
+          clickedList: newClicked
+        })
+      } else {
+        let newClicked = this.state.clickedList;
+        newClicked[0] = 'y';
+        newClicked[this.props.max] = 'n';
+        this.setState({
+          currentIndex: 0,
+          clickedList: newClicked
+        })
+      }
+      console.log(index);
+      break;
 
       case 13: //This is enter
       console.log("enter");
@@ -157,17 +207,16 @@ class FilterBox extends React.Component {
       if(count != this.props.max){
         ++count;
         return (
-          <div className='FilterBoxItem' key={i}
+          <div className={this.state.clickedList[count - 1]} key={i}
             onClick={(e) => this.handlePresetClick(e, cur)}
             onMouseEnter={() => this.handlePresetEnter(cur)}
-            onMouseLeave={() => this.handlePresetExit()}
-            onKeyDown={(e) => this.handleKeyDown(e)}>
+            onMouseLeave={() => this.handlePresetExit(cur)}>
             {cur}
           </div>
         );
       } else if(remaining > 0) {
         return (
-          <div className='FilterBoxItem' key={i}>
+          <div className='n' key={i}>
             <i>{response}</i>
           </div>
         );
@@ -183,6 +232,7 @@ class FilterBox extends React.Component {
             onFocus={(e) => this.handleInputClick(e)}
             onChange={(e) => this.handleInputChange(e)}
             onBlur={(e) => this.handleOffFocus(e)}
+            onKeyDown={(e) => this.handleKeyDown(e)}
             type="text"
             className="FilterBoxInput">
           </input>
