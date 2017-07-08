@@ -1,8 +1,6 @@
 import React from 'react';
 import '../stylesheets/FilterBox.css';
 
-'use strict'
-
 class FilterBox extends React.Component {
 
   constructor() {
@@ -16,7 +14,7 @@ class FilterBox extends React.Component {
       lastVal: '',
       courseListing: null,
       courseBackup: null,
-      clickedList: null
+      currentClicked: null
     };
   }
 
@@ -24,7 +22,9 @@ class FilterBox extends React.Component {
     max: React.PropTypes.number.isRequired,
     handleSelect: React.PropTypes.func.isRequired,
     objects: React.PropTypes.list.isRequired,
-    caseSensitive: React.PropTypes.bool
+    caseSensitive: React.PropTypes.bool,
+    listStyle: React.PropTypes.object,
+    inputStyle: React.PropTypes.object
   }
 
   componentWillMount(){
@@ -33,12 +33,8 @@ class FilterBox extends React.Component {
     this.setState({
       start: false,
       courseListing: newList,
-      courseBackup: newList,
-      clickedList: Array(newLen).fill('n')
+      courseBackup: newList
     })
-  }
-
-  setObjectState(){
   }
 
   handleInputChange(e) {
@@ -197,7 +193,10 @@ class FilterBox extends React.Component {
       if(count != this.props.max){
         ++count;
         return (
-          <div className={this.state.currentClicked === cur ? 'entrySelected' : 'entry'} key={i}
+          <div
+          style={this.props.listStyle}
+          className={this.state.currentClicked === cur ? 'entrySelected' : 'entry'}
+          key={i}
             onClick={(e) => this.handlePresetClick(e, cur)}
             onMouseEnter={() => this.handlePresetEnter(cur)}
             onMouseLeave={() => this.handlePresetExit(cur)}>
@@ -225,6 +224,7 @@ class FilterBox extends React.Component {
             onKeyDown={(e) => this.handleKeyDown(e)}
             value={this.state.inputValue}
             type="text"
+            style={this.props.inputStyle}
             className="FilterBoxInput"
             id="FilterBoxInput"
             placeholder="Find Subject">
