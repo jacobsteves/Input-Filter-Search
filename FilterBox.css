@@ -4,12 +4,10 @@
     list-style-type: none;
 }
 
-.results {
-}
-
 .FilterBoxDropDown {
-  	left: 0;
-  	position: absolute;
+  	margin: 0 auto;
+    padding-top: 5%;
+    padding-bottom: 15%;
   	top: 35px;
   	z-index: 1;
     width: 30%;
@@ -27,16 +25,19 @@
      -moz-box-shadow: 0 8px 6px -6px black;
           box-shadow: 0 8px 6px -6px black;
 }
-.FilterBoxDropDown .FilterBoxItem {
+.FilterBoxDropDown .entry {
     font: normal 13px/50px Arial, Helvetica, sans-serif;
     padding: 0 25px;
   	background: #01abf8;
   	color:#FFF;
   }
 
-  .FilterBoxDropDown .FilterBoxItem:hover {
-  	background: #bbb;
-  }
+.FilterBoxDropDown .entrySelected {
+  font: normal 13px/50px Arial, Helvetica, sans-serif;
+  padding: 0 25px;
+	background: #bbb;
+  color:#FFF;
+}
 
 .FilterBoxInput {
     width: 100%;
@@ -45,4 +46,8 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+.hiddenSubmit {
+  visibility: hidden;
 }

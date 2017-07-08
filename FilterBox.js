@@ -1,13 +1,7 @@
 import React from 'react';
-import $ from 'jquery';
 import '../stylesheets/FilterBox.css';
 
 'use strict'
-
-var caseInsensIndexOf = function(list, str) {
-  var lowerList = list.map(function(item) { return item.toLowerCase(); });
-  return lowerList.indexOf(str.toLowerCase());
-};
 
 class FilterBox extends React.Component {
 
@@ -22,14 +16,15 @@ class FilterBox extends React.Component {
       lastVal: '',
       courseListing: null,
       courseBackup: null,
-      clickedList: null // 'n' = no, not clicked; 'y' = yes, clicked
+      clickedList: null
     };
   }
 
   static propTypes: {
     max: React.PropTypes.number.isRequired,
     handleSelect: React.PropTypes.func.isRequired,
-    objects: React.PropTypes.list.isRequired
+    objects: React.PropTypes.list.isRequired,
+    caseSensitive: React.PropTypes.bool
   }
 
   componentWillMount(){
@@ -47,9 +42,16 @@ class FilterBox extends React.Component {
   }
 
   handleInputChange(e) {
+    const filteredList = this.state.courseBackup.filter((cur) => {
+      return (
+        this.props.caseSensitive ?
+        cur.includes(e.target.value) :
+        cur.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+    });
     this.setState({
       inputValue: e.target.value,
-      courseListing: this.state.courseBackup.filter((cur) => {return cur.toLowerCase().includes(e.target.value.toLowerCase())})
+      courseListing: filteredList
     })
   }
 
@@ -79,7 +81,9 @@ class FilterBox extends React.Component {
       const { courseBackup } = this.state;
       const value = courseBackup[currentIndex];
       this.setState({
-        lastVal: value
+        lastVal: value,
+        inputValue: value,
+        courseListing: value
       });
       this.handlePresetClick(e, value);
     } else {
@@ -94,8 +98,7 @@ class FilterBox extends React.Component {
       });
       this.props.handleSelect(inputValue, index);
     }
-    $('#FilterBoxInput').blur(); //Deselect the input box
-    $('#FilterBoxInput').val('');
+    document.getElementById("FilterBoxInput").blur();
   }
 
   handleSelect(choice, index){
@@ -112,12 +115,12 @@ class FilterBox extends React.Component {
       return cur.toLowerCase();
     });
     const index = courseListing.indexOf(value.toLowerCase());
-    let newClicked = this.state.clickedList;
-    newClicked[index] = 'n';
     this.setState({
       open: false,
+      inputValue: value,
       currentIndex: -1,
-      clickedList: newClicked
+      currentClicked: value,
+      courseListing: value
     });
     this.props.handleSelect(value, index);
   }
@@ -127,11 +130,9 @@ class FilterBox extends React.Component {
       return cur.toLowerCase();
     });
     const index = courseListing.indexOf(value.toLowerCase());
-    let newClicked = this.state.clickedList;
-    newClicked[index] = 'y';
     this.setState({
       currentIndex: index,
-      clickedList: newClicked
+      currentClicked: value
     });
   }
 
@@ -140,63 +141,48 @@ class FilterBox extends React.Component {
       return cur.toLowerCase();
     });
     const index = courseListing.indexOf(value.toLowerCase());
-    let newClicked = this.state.clickedList;
-    newClicked[index] = 'n';
     this.setState({
       currentIndex: -1,
-      clickedList: newClicked
+      currentClicked: null
     })
   }
 
   handleKeyDown(e){
     let index = this.state.currentIndex;
     switch(e.keyCode){
-      case 38: //This is the up arrow
-      console.log("up");
+
+      // Up Arrow Clicked
+      case 38:
       if(index >= 1) {
-        let newClicked = this.state.clickedList;
-        newClicked[index] = 'n';
-        newClicked[index - 1] = 'y';
         this.setState({
           currentIndex: index - 1,
-          clickedList: newClicked
+          currentClicked: this.props.objects[index - 1]
         })
       } else {
-        let newClicked = this.state.clickedList;
-        newClicked[0] = 'n';
-        newClicked[this.props.max] = 'y';
         this.setState({
           currentIndex: this.props.max,
-          clickedList: newClicked
+          currentClicked: this.props.objects[this.props.max - 1]
         })
       }
-      console.log(index);
       break;
 
-      case 40: //This is the down arrow
-      console.log("down");
-      if(index < this.props.max) {
-        let newClicked = this.state.clickedList;
-        newClicked[index] = 'n';
-        newClicked[index + 1] = 'y';
+      // Down arrow clicked
+      case 40:
+      if(index < this.props.max - 1) {
         this.setState({
           currentIndex: index + 1,
-          clickedList: newClicked
+          currentClicked: this.props.objects[index + 1]
         })
       } else {
-        let newClicked = this.state.clickedList;
-        newClicked[0] = 'y';
-        newClicked[this.props.max] = 'n';
         this.setState({
           currentIndex: 0,
-          clickedList: newClicked
+          currentClicked: this.props.objects[0]
         })
       }
-      console.log(index);
       break;
 
-      case 13: //This is enter
-      console.log("enter");
+      // Enter clicked
+      case 13:
       break;
     }
   }
@@ -211,7 +197,7 @@ class FilterBox extends React.Component {
       if(count != this.props.max){
         ++count;
         return (
-          <div className={this.state.clickedList[count - 1]} key={i}
+          <div className={this.state.currentClicked === cur ? 'entrySelected' : 'entry'} key={i}
             onClick={(e) => this.handlePresetClick(e, cur)}
             onMouseEnter={() => this.handlePresetEnter(cur)}
             onMouseLeave={() => this.handlePresetExit(cur)}>
@@ -229,15 +215,15 @@ class FilterBox extends React.Component {
   }
 
   renderContent() {
-    $(".FilterBoxInput").attr("autoComplete", "off"); //Disable autocomplete for our input
     return (
       <div className="FilterBoxDropDown">
-        <form onSubmit={(e) => this.handleInputSubmit(e)}>
+        <form onSubmit={(e) => this.handleInputSubmit(e)} autoComplete={"off"}>
           <input
             onFocus={(e) => this.handleInputClick(e)}
-            onKeyUp={(e) => this.handleInputChange(e)}
+            onChange={(e) => this.handleInputChange(e)}
             onBlur={(e) => this.handleOffFocus(e)}
             onKeyDown={(e) => this.handleKeyDown(e)}
+            value={this.state.inputValue}
             type="text"
             className="FilterBoxInput"
             id="FilterBoxInput"
@@ -264,5 +250,10 @@ class FilterBox extends React.Component {
     );
   }
 }
+
+FilterBox.defaultProps = {
+  max: 10,
+  caseSensitive: false
+};
 
 export default FilterBox;
