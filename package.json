@@ -1,0 +1,25 @@
+{
+  "name": "react-input-filter",
+  "version": "1.0.0",
+  "description": "An input box that uses React to filter through an array of data to match the text input as characters are entered.",
+  "main": "FilterBox.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jacobsteves/InputFilterSearch.git"
+  },
+  "keywords": [
+    "Input",
+    "Filter",
+    "Search",
+    "React"
+  ],
+  "author": "Jacob Steves",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jacobsteves/InputFilterSearch/issues"
+  },
+  "homepage": "https://github.com/jacobsteves/InputFilterSearch#readme"
+}
